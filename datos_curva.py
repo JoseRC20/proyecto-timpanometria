@@ -23,3 +23,10 @@ def crear_coordenadas(presion, compliancia_estatica, mitad_compliance, ancho_1, 
     Punto_3 = np.array([ancho_2, mitad_compliance])
     
     return Punto_1, Punto_2, Punto_3
+
+def seleccionar_oido():
+    while True:
+        lado = input("¿Qué oído está midiendo? (derecho/izquierdo): ").strip().lower()
+        if lado in ("derecho", "izquierdo"):
+            return lado
+        print("Opción inválida. Escribí 'derecho' o 'izquierdo'.")

@@ -1,3 +1,4 @@
+
 def datos_paciente():
     """Pide los datos del paciente y devuelve un diccionario."""
     nombre = input("Nombre: ")
