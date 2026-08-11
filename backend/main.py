@@ -3,6 +3,7 @@ from datos_paciente import datos_paciente, datos_consulta
 from datos_curva import seleccionar_oido, datos_prueba, preparar_datos, crear_coordenadas
 from grafico_curva import graficar
 from generar_pdf import generar_pdf_informe
+from database.repositorio import guardar_paciente_completo
 
 
 
@@ -35,7 +36,7 @@ def main():
         otro = input("¿Cargar datos del otro oído? (s/n): ").strip().lower()
         seguir = otro == "s"
         
-
+    guardar_paciente_completo(p1)
 
     generar_pdf_informe(
         p1,
