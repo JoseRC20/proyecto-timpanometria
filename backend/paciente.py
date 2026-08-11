@@ -1,8 +1,9 @@
 class Oido:
-    def __init__(self, compliancia, presion, gradiente):
+    def __init__(self, compliancia, presion, gradiente, puntos):
         self.compliancia = compliancia
         self.presion = presion
         self.gradiente = gradiente
+        self.puntos = puntos
 
     def __repr__(self):
         return f"Oido(compliancia={self.compliancia}, presion={self.presion}, gradiente={self.gradiente})"
@@ -14,13 +15,18 @@ class Paciente:
         self.segundo_apellido = segundo_apellido
         self.rut = rut
         self.fecha_nacimiento = fecha_nacimiento
+        self.nombre_doctor = None      
+        self.fecha_consulta = None
         self.id_paciente = id_paciente
         self.oido_derecho = None
         self.oido_izquierdo = None
+        
+    def cargar_consulta(self, nombre_doctor, fecha_consulta):   # 👈 método que faltaba
+        self.nombre_doctor = nombre_doctor
+        self.fecha_consulta = fecha_consulta
 
-    def cargar_oido(self, lado, compliancia, presion, gradiente):
+    def cargar_oido(self, lado, oido):
         """lado debe ser 'derecho' o 'izquierdo'"""
-        oido = Oido(compliancia, presion, gradiente)
         if lado == "derecho":
             self.oido_derecho = oido
         elif lado == "izquierdo":
