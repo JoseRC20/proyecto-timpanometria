@@ -1,31 +1,49 @@
-from paciente import Paciente
-from datos_curva import datos_prueba, preparar_datos, crear_coordenadas, seleccionar_oido
-from grafico_curva import graficar
+from paciente import Paciente, Oido
 from datos_paciente import datos_paciente, datos_consulta
+from datos_curva import seleccionar_oido, datos_prueba, preparar_datos, crear_coordenadas
+from grafico_curva import graficar
+from generar_pdf import generar_pdf_informe
 
-# --- Datos del paciente y consulta (una sola vez) ---
-nombre, primer_apellido, segundo_apellido, rut, fecha_nacimiento = datos_paciente()
-nombre_doctor, fecha_consulta = datos_consulta()
 
-p1 = Paciente(nombre, primer_apellido, segundo_apellido, rut, fecha_nacimiento)
 
-# --- Función para no repetir el bloque de proceso + gráfico ---
-def procesar_y_graficar_oido(oido):
-    mitad_compliance, ancho_1, ancho_2 = preparar_datos(oido.compliancia, oido.presion, oido.gradiente)
-    Punto_1, Punto_2, Punto_3 = crear_coordenadas(oido.presion, oido.compliancia, mitad_compliance, ancho_1, ancho_2)
-    graficar(Punto_1, Punto_2, Punto_3, mitad_compliance)
-
-# --- Cargar y graficar oído(s) ---
-seguir = True
-while seguir:
-    lado = seleccionar_oido()
+def procesar_oido(p1, lado):
     compliancia_estatica, presion, gradiente = datos_prueba()
+    mitad_compliance, ancho_1, ancho_2 = preparar_datos(compliancia_estatica, presion, gradiente)
+    puntos = crear_coordenadas(presion, compliancia_estatica, mitad_compliance, ancho_1, ancho_2)
 
-    p1.cargar_oido(lado, compliancia_estatica, presion, gradiente)
-    oido = p1.obtener_oido(lado)
-    procesar_y_graficar_oido(oido)
+    oido = Oido(compliancia_estatica, presion, gradiente, puntos)
+    p1.cargar_oido(lado, oido)
 
-    otro = input("¿Cargar datos del otro oído? (s/n): ").strip().lower()
-    seguir = otro == "s"
+    Punto_1, Punto_2, Punto_3 = puntos
+    ruta_imagen = f"grafico_{lado}.png"
+    graficar(Punto_1, Punto_2, Punto_3, mitad_compliance, lado=lado, guardar_como=ruta_imagen)
+    return ruta_imagen
 
-print(p1)
+
+def main():
+    nombre, primer_apellido, segundo_apellido, rut, fecha_nacimiento = datos_paciente()
+    nombre_doctor, fecha_consulta = datos_consulta()
+
+    p1 = Paciente(nombre, primer_apellido, segundo_apellido, rut, fecha_nacimiento)
+    p1.cargar_consulta(nombre_doctor, fecha_consulta)
+
+    imagenes = {}
+    seguir = True
+    while seguir:
+        lado = seleccionar_oido()
+        imagenes[lado] = procesar_oido(p1, lado)
+        otro = input("¿Cargar datos del otro oído? (s/n): ").strip().lower()
+        seguir = otro == "s"
+        
+
+
+    generar_pdf_informe(
+        p1,
+        ruta_salida=f"informe_{p1.rut}.pdf",
+        imagen_derecho=imagenes.get("derecho"),
+        imagen_izquierdo=imagenes.get("izquierdo"),
+    )
+
+
+if __name__ == "__main__":
+    main()
